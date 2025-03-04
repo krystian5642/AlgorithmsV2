@@ -29,6 +29,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         Core/algorithmbenchmarkwindow.cpp Core/algorithmbenchmarkwindow.h Core/algorithmbenchmarkwindow.ui
         Core/datastructurewidget.h Core/datastructurewidget.cpp
         Core/algorithmwidgetlibrary.h Core/algorithmwidgetlibrary.cpp
+        Core/propertylayoutfactory.h Core/propertylayoutfactory.cpp
 
         # Graph classes
         Graphs/graph.h Graphs/graph.cpp

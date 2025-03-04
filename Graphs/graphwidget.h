@@ -4,6 +4,9 @@
 #include "../Core/datastructurewidget.h"
 #include "graph.h"
 
+#include <QComboBox>
+#include <QDialog>
+
 class GraphNodePropertiesWidget;
 
 QT_BEGIN_NAMESPACE
@@ -24,6 +27,19 @@ struct GraphNodeVisualData
 struct GraphEdgeVisualData
 {
     QColor color = Qt::black;
+};
+
+class RandomGraphPropertiesWindow : public QDialog
+{
+    Q_OBJECT
+
+public:
+    RandomGraphPropertiesWindow(QWidget *parent = nullptr);
+
+    QString getSelectedGraphTypeName() const;
+
+private:
+    QComboBox* graphTypesBox;
 };
 
 class GraphWidget : public DataStructureWidget
@@ -55,7 +71,7 @@ public:
     void saveAction() override;
     void loadAction() override;
     void clearAction() override;
-    void generateRandomAction() override;
+    void generateRandomStructureAction() override;
     void visualizeAlgorithmAction(const QString& algorithmName, bool pause) override;
     void runBenchmarkAction(const QString& algorithmName) override;
 
@@ -78,6 +94,9 @@ private:
 
     bool saveGraphNodeLocations();
     bool loadGraphNodeLocations();
+
+    void generateRandomGraph();
+    void generateRandomGridGraph();
 
     Ui::GraphWidget *ui;
     Graph graph;

@@ -13,6 +13,7 @@ public:
     virtual void run() = 0;
     virtual void visualize(QWidget* widget) = 0;
     virtual void setPauseVisualization(bool pause) = 0;
+    virtual QWidget *getPropertiesWidget() = 0;
 
 signals:
     void visualizationFinished();

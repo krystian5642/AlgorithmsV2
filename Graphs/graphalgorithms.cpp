@@ -2,6 +2,15 @@
 #include "graphwidget.h"
 #include "edgelist.h"
 
+#include "../Core/propertylayoutfactory.h"
+
+#include <QCheckBox>
+#include <QHBoxLayout>
+#include <QIntValidator>
+#include <QLabel>
+#include <QLineEdit>
+#include <QMetaProperty>
+
 GraphAlgorithm::GraphAlgorithm(const Graph* inGraph)
     : graph(inGraph)
     , showEdgeInterval(1000)
@@ -23,6 +32,28 @@ GraphAlgorithm::~GraphAlgorithm()
 {
 }
 
+QWidget* GraphAlgorithm::getPropertiesWidget()
+{
+    QWidget* propertiesWidget = new QWidget();
+    propertiesWidget->setMaximumHeight(250);
+    propertiesWidget->setMinimumHeight(250);
+
+    QVBoxLayout* propertyLayout = new QVBoxLayout(propertiesWidget);
+
+    const QMetaObject* myMetaObject = metaObject();
+    for (int i = 0; i < myMetaObject->propertyCount(); i++)
+    {
+        const QMetaProperty metaProperty = myMetaObject->property(i);
+        if(QString(metaProperty.name()) != "objectName")
+        {
+            propertyLayout->addLayout(PropertyLayoutFactory::get().createLayoutForProperty(metaProperty, this, propertiesWidget));
+        }
+    }
+
+    propertyLayout->addStretch();
+    return propertiesWidget;
+}
+
 void GraphAlgorithm::setPauseVisualization(bool pause)
 {
     if(pause)
@@ -42,10 +73,36 @@ void GraphAlgorithm::setGraph(const Graph *newGraph)
     start = graph->getRandomValue();
 }
 
-BFS::BFS(const Graph* inGraph)
-    : GraphAlgorithm(inGraph)
+int GraphAlgorithm::getStart() const
 {
+    return start;
+}
 
+void GraphAlgorithm::setStart(int newStart)
+{
+    if (start == newStart)
+    {
+        return;
+    }
+
+    start = newStart;
+    emit startChanged();
+}
+
+bool GraphAlgorithm::getRandomStart() const
+{
+    return randomStart;
+}
+
+void GraphAlgorithm::setRandomStart(bool newRandomStart)
+{
+    if (randomStart == newRandomStart)
+    {
+        return;
+    }
+
+    randomStart = newRandomStart;
+    emit randomStartChanged();
 }
 
 void BFS::run()
@@ -73,8 +130,7 @@ void BFS::run()
 }
 
 void BFS::visualize(QWidget *widget)
-{
-
+{  
 }
 
 DFS::DFS(const Graph* inGraph)
@@ -183,6 +239,38 @@ void BFSShortestPath::setGraph(const Graph *newGraph)
 {
     GraphAlgorithm::setGraph(newGraph);
     end = graph->getRandomValue();
+}
+
+int BFSShortestPath::getEnd() const
+{
+    return end;
+}
+
+void BFSShortestPath::setEnd(int newEnd)
+{
+    if (end == newEnd)
+    {
+        return;
+    }
+
+    end = newEnd;
+    emit endChanged();
+}
+
+bool BFSShortestPath::getRandomEnd() const
+{
+    return randomEnd;
+}
+
+void BFSShortestPath::setRandomEnd(bool newRandomEnd)
+{
+    if (randomEnd == newRandomEnd)
+    {
+        return;
+    }
+
+    randomEnd = newRandomEnd;
+    emit randomEndChanged();
 }
 
 TreeCenters::TreeCenters(const Graph* inGraph)

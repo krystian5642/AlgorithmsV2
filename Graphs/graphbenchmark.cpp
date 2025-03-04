@@ -2,6 +2,7 @@
 
 #include <QElapsedTimer>
 #include <QRandomGenerator>
+#include <QThread>
 
 GraphBenchmark::GraphBenchmark(const QString& inAlgorithmName, const QSharedPointer<GraphAlgorithm>& inGraphAlgorithm)
     : algorithmName(inAlgorithmName)
@@ -39,6 +40,11 @@ void GraphBenchmark::run()
         emit updated(QPointF(static_cast<qreal>(testGraph.getEdgesNum() + testGraph.getNodesNum()), static_cast<qreal>(executionTime.nsecsElapsed())));
 
         //result.append(QPointF(static_cast<qreal>(testGraph.getEdgesNum() + testGraph.getNodesNum()), static_cast<qreal>(executionTime.nsecsElapsed())));
+
+        if(i < 300)
+        {
+            QThread::msleep(20);
+        }
     }
 
     emit finished(algorithmName, result);

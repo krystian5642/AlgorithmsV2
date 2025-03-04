@@ -1,5 +1,6 @@
 #include "graphwidget.h"
 
+#include <QComboBox>
 #include <QFile>
 #include <QJsonDocument>
 #include <QMessageBox>
@@ -14,6 +15,46 @@
 
 #include "graphalgorithms.h"
 #include "graphbenchmark.h"
+
+namespace GraphTypeNames
+{
+    const QString AllRandom("All random");
+    const QString Grid("Grid");
+}
+
+RandomGraphPropertiesWindow::RandomGraphPropertiesWindow(QWidget *parent)
+    : QDialog(parent)
+{
+    setWindowTitle("Random Graph");
+
+    QVBoxLayout* mainLayout = new QVBoxLayout(this);
+
+    QHBoxLayout* layout = new QHBoxLayout;
+    mainLayout->addLayout(layout);
+
+    QLabel* label = new QLabel(this);
+    label->setText("Graph type : ");
+
+    graphTypesBox = new QComboBox(this);
+    graphTypesBox->addItem(GraphTypeNames::AllRandom);
+    graphTypesBox->addItem(GraphTypeNames::Grid);
+
+    layout->addWidget(label);
+    layout->addWidget(graphTypesBox);
+
+    QPushButton* okButton = new QPushButton("ok", this);
+    mainLayout->addWidget(okButton);
+
+    connect(okButton, &QPushButton::clicked, this, [this]()
+    {
+        accept();
+    });
+}
+
+QString RandomGraphPropertiesWindow::getSelectedGraphTypeName() const
+{
+    return graphTypesBox->currentText();
+}
 
 GraphWidget::GraphWidget(QWidget *parent)
     : DataStructureWidget(parent)
@@ -211,40 +252,30 @@ void GraphWidget::clearAction()
     updateGraphProperites();
 }
 
-void GraphWidget::generateRandomAction()
+void GraphWidget::generateRandomStructureAction()
 {
-    clearAlgorithm();
-    clearGraph();
+    RandomGraphPropertiesWindow randomGraphProperities;
+    randomGraphProperities.exec();
 
-    for(int i=0; i<=1000; i++)
+    if(randomGraphProperities.result() == QDialog::DialogCode::Accepted)
     {
-        const int randomValueX = QRandomGenerator::global()->bounded(600);
-        const int randomValueY = QRandomGenerator::global()->bounded(600);
+        clearAlgorithm();
+        clearGraph();
 
-        const QPoint randomLocationX(QRandomGenerator::global()->bounded(10000), QRandomGenerator::global()->bounded(10000));
-        const QPoint randomLocationY(QRandomGenerator::global()->bounded(10000), QRandomGenerator::global()->bounded(10000));
+        const QString selectedGraphTypeName = randomGraphProperities.getSelectedGraphTypeName();
 
-        addNode(randomValueX, randomLocationX);
-        addNode(randomValueY, randomLocationY);
+        if(selectedGraphTypeName == GraphTypeNames::AllRandom)
+        {
+            generateRandomGraph();
+        }
+        else if(selectedGraphTypeName == GraphTypeNames::Grid)
+        {
+            generateRandomGridGraph();
+        }
 
-        addEdge(randomValueX, graph.getRandomValue());
-        addEdge(randomValueY, graph.getRandomValue());
+        update();
+        updateGraphProperites();
     }
-
-    const int randomValueX = 1;
-    const int randomValueY = 5;
-
-    const QPoint randomLocationX(QRandomGenerator::global()->bounded(10000), QRandomGenerator::global()->bounded(10000));
-    const QPoint randomLocationY(QRandomGenerator::global()->bounded(10000), QRandomGenerator::global()->bounded(10000));
-
-    addNode(randomValueX, randomLocationX);
-    addNode(randomValueY, randomLocationY);
-
-    addEdge(randomValueX, graph.getRandomValue());
-    addEdge(randomValueY, graph.getRandomValue());
-
-    update();
-    updateGraphProperites();
 }
 
 void GraphWidget::visualizeAlgorithmAction(const QString& algorithmName, bool pause)
@@ -470,6 +501,64 @@ bool GraphWidget::loadGraphNodeLocations()
     fromJsonObject(locationsAsJsonObject);
 
     return true;
+}
+
+void GraphWidget::generateRandomGraph()
+{
+    for(int i=0; i<=1000; i++)
+    {
+        const int randomValueX = QRandomGenerator::global()->bounded(600);
+        const int randomValueY = QRandomGenerator::global()->bounded(600);
+
+        const QPoint randomLocationX(QRandomGenerator::global()->bounded(10000), QRandomGenerator::global()->bounded(10000));
+        const QPoint randomLocationY(QRandomGenerator::global()->bounded(10000), QRandomGenerator::global()->bounded(10000));
+
+        addNode(randomValueX, randomLocationX);
+        addNode(randomValueY, randomLocationY);
+
+        addEdge(randomValueX, graph.getRandomValue());
+        addEdge(randomValueY, graph.getRandomValue());
+    }
+}
+
+void GraphWidget::generateRandomGridGraph()
+{
+    // this info will be taken from UI later
+    constexpr int columns = 20;
+    constexpr int rows = 20;
+    constexpr int nodeSpace = 50;
+    constexpr QPoint startLoc(50, 50);
+
+    QList<int> prevRow(columns);
+    for(int i = 0; i < rows; i++)
+    {
+        int prevValue = -1;
+        for(int j = 0; j < columns; j++)
+        {
+            const int randomValue = QRandomGenerator::global()->bounded(10000);
+
+            if(addNode(randomValue, QPoint(startLoc.x()  + nodeSpace * j, startLoc.y() + nodeSpace * i)))
+            {
+                if(j > 0 && prevValue != -1)
+                {
+                    addEdge(prevValue, randomValue);
+                }
+
+                if(i > 0 && prevRow[j] != -1)
+                {
+                    addEdge(prevRow[j], randomValue);
+                }
+
+                prevRow[j] = randomValue;
+
+                prevValue = randomValue;
+            }
+            else
+            {
+                prevRow[j] = -1;
+            }
+        }
+    }
 }
 
 void GraphWidget::clearAlgorithm()

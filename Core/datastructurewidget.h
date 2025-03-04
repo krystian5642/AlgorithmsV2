@@ -35,7 +35,7 @@ public:
     virtual void saveAction() = 0;
     virtual void loadAction() = 0;
     virtual void clearAction() = 0;
-    virtual void generateRandomAction() = 0;
+    virtual void generateRandomStructureAction() = 0;
     virtual void visualizeAlgorithmAction(const QString& algorithmName, bool pause) = 0;
     virtual void runBenchmarkAction(const QString& algorithmName) = 0;
 

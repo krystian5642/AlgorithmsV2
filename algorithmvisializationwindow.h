@@ -3,12 +3,8 @@
 
 #include <QMainWindow>
 
-class GraphWidget;
-class GraphAlgorithm;
-class QComboBox;
 
-class AlgorithmBenchmarkWindow;
-
+class DataStructureWidget;
 namespace Ui
 {
 class AlgorithmVisualizationWindow;
@@ -30,19 +26,17 @@ private slots:
     void on_actionSave_triggered();
     void on_actionLoad_triggered();
     void on_actionClear_triggered();
+    void on_actionGenerateRandomStructure_triggered();
     void on_actionRun_Algorithm_triggered(bool isOn);
-    void on_actionGenerateRandomGraph_triggered();
-    void on_actionGenerateRandomGridGraph_triggered();
-    void on_actionAlgorithm_benchmark_triggered();
 
 private:
     void setupUi();
-    void setAlgorithmWidget(QWidget* widget);
+    void setDataStructureWidget(DataStructureWidget* widget);
 
     QString getSelectedAlgorithmName() const;
 
     Ui::AlgorithmVisualizationWindow *ui;
-    GraphWidget* graphWidget;
+    DataStructureWidget* dataStructureWidget;
 };
 
 #endif // AlgorithmsMAINWINDOW_H
